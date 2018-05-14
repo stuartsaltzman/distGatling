@@ -185,6 +185,7 @@ public class Master extends AbstractPersistentActor {
     }
 
     public Optional<String> processCmdLineJob(MasterClientProtocol.CommandLineJob cmdJob) {
+        System.out.println("Master->processCmdLineJob. cmdJob: " + cmdJob);
         ClientConfig clientConfig = cmdJob.clientConfig;
         getSender().tell(new Ack(cmdJob.clientId), getSelf());
         String trackingId = UUID.randomUUID().toString();
@@ -377,6 +378,8 @@ public class Master extends AbstractPersistentActor {
             UploadFile uploadFile = fileDatabase.get(tId);
             if (uploadFile.type.equalsIgnoreCase("lib")) {
                 String soonToBeRemotePath = agentConfig.getMasterUrl(uploadFile.path);
+                System.out.println("**** onWorkerRequestsFile - soonToBeRemotePath: " + soonToBeRemotePath);
+                System.out.println("**** onWorkerRequestsFile - uploadFile: " + uploadFile);
                 getSender().tell(new FileJob(null, uploadFile, soonToBeRemotePath), getSelf());
             } else {
                 String content = FileUtils.readFileToString(new File(uploadFile.path));

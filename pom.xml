@@ -29,6 +29,7 @@
         <module>gatling-agent</module>
         <module>gatling-commons</module>
         <module>gatling-client</module>
+        <module>gatling-uber-example</module>
     </modules>
     <properties>
         <current.version>1.0.2-SNAPSHOT</current.version>

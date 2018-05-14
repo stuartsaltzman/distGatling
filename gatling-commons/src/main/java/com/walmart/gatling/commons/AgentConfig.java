@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,18 +79,24 @@ public class AgentConfig {
     }
 
     public String getUrl(String filePath) {
-        return getGenericUrl("api/log/stream","filePath",filePath);
+        return getGenericUrl("api/log/stream","filePath", filePath);
     }
 
     public String getMasterUrl(String filePath) {
-        return getGenericUrl("gatling/lib/stream","filePath",filePath);
+        return getGenericUrl("gatling/lib/stream","filePath", filePath);
     }
 
     public String getAbortUrl() {
-        return getGenericUrl("gatling/server/abort","trackingId",StringUtils.EMPTY);
+        return getGenericUrl("gatling/server/abort","trackingId", StringUtils.EMPTY);
     }
 
-    public String getGenericUrl(String path,String queryStringKey,String queryStringValue) {
+    public String getGenericUrl(String path, String queryStringKey, String queryStringValue) {
+        System.out.println("path: " + path);
+        System.out.println("queryStringKey: " + queryStringKey);
+        System.out.println("queryStringValue: " + queryStringValue);
+        if (queryStringValue == null) {
+            queryStringValue = "";
+        }
         String host = logServer.getHostName();
         if (StringUtils.isEmpty(logServer.getHostName())) {
             try {
@@ -101,7 +108,7 @@ public class AgentConfig {
         String result = StringUtils.EMPTY;
         final String ENCODING = "UTF-8";
         try {
-            result = String.format("http://%s:%s/%s?%s=%s", host, Integer.toString(logServer.getPort()),path, queryStringKey,URLEncoder.encode(queryStringValue, ENCODING));
+            result = String.format("http://%s:%s/%s?%s=%s", host, Integer.toString(logServer.getPort()), path, queryStringKey, URLEncoder.encode(queryStringValue, ENCODING));
         } catch (UnsupportedEncodingException e) {
             ;
         }

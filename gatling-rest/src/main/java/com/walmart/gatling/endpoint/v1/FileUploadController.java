@@ -65,6 +65,8 @@ public class FileUploadController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/upload")
     public String provideUploadInfo(Model model) throws IOException {
+        System.out.println("*** FileUploadController->provideUploadInfo");
+        System.out.println("*** FileUploadController->tempFileDir: " + tempFileDir);
         File rootFolder = new File(tempFileDir);
         if (!rootFolder.exists()) {
             rootFolder.mkdir();
@@ -82,7 +84,9 @@ public class FileUploadController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/uploadFile")
-    public String uploadFile(MultipartHttpServletRequest request, @RequestParam("file") MultipartFile file) {
+    public String uploadFile(MultipartHttpServletRequest request, @RequestParam(value = "file", required = false) MultipartFile file) {
+        System.out.println("*** FileUploadController->uploadFile");
+        System.out.println("*** FileUploadController->tempFileDir: " + tempFileDir);
         if (!file.isEmpty()) {
             String filePath = tempFileDir + "/" + UUID.randomUUID().toString() + "/" + file.getOriginalFilename();
             try {
@@ -111,6 +115,7 @@ public class FileUploadController {
         SimulationJobModel job = new SimulationJobModel();
         String dataFilePath = "";//should be empty by default
         String bodiesFilePath = "";//should be empty by default
+        //System.out.println("*** FileUploadController->uploadAndRunSimulation");
         if (!simulationFile.isEmpty()) {
             try {
                 if (dataFile != null && !dataFile.isEmpty()) {

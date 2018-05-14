@@ -18,7 +18,10 @@ log/
 target/
 /bin/
 shared-journal/
-gatling-rest/shared-journal/
+gatling-rest/gatling-commons/journal/
+
+journal/
+package-lock.json
 
 /gatling-rest/src/main/resources/static/node_modules/*.*
 /gatling-rest/src/main/resources/static/node_modules/

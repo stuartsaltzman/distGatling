@@ -24,6 +24,5 @@ CLIENT_PATH="target/gatling-client-1.0.2-SNAPSHOT.jar"
 # Run Gatling
 java $JAVA_OPTS -jar ${CLIENT_PATH} com.walmart.gatling.client.Client --spring.config.location=config.yml
 
-
 #Example /bin/bash dist-gatling-client.sh -Dclient.userName=Command -Dclient.parallelism=1
 

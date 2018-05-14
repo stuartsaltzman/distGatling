@@ -41,24 +41,29 @@ public class UploadUtils {
         CloseableHttpClient client = HttpClientBuilder.create()
                 .build();
 
+        System.out.println("*** Client->uploadFile. Server: " + server);
+        System.out.println("*** Client->uploadFile. path: " + path);
 
         HttpPost post = new HttpPost( server + "/uploadFile");
         //File jarFile = new File(jarFilePath);
         File dataFeedFile = new File(path);
-        String message = HostUtils.lookupHost();
+        String host = HostUtils.lookupHost();
+        System.out.println("*** Client->uploadFile. host: " + host);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         //builder.addBinaryBody("jarFile", jarFile, ContentType.DEFAULT_BINARY, jarFile.getName());
         builder.addBinaryBody("file", dataFeedFile, ContentType.DEFAULT_BINARY, dataFeedFile.getName());
-        builder.addTextBody("client", message, ContentType.DEFAULT_BINARY);
+        builder.addTextBody("client", host, ContentType.DEFAULT_BINARY);
+
+        // FIXME: hardcode username/password
+        post.addHeader("Authorization", "Basic Z2F0bGluZzpnYXRsaW5n");
 
         HttpEntity entity = builder.build();
         post.setEntity(entity);
         try {
             HttpResponse response = client.execute(post);
-            final int statusCode = response.getStatusLine()
-                    .getStatusCode();
+            final int statusCode = response.getStatusLine().getStatusCode();
             return IOUtils.toString(response.getEntity().getContent());
         } catch (IOException e) {
             e.printStackTrace();

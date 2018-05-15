@@ -67,6 +67,7 @@ public class ClientConfiguration {
        clientConfig.setJarPath(env.getProperty("client.jarPath"));
        clientConfig.setJarFileName(env.getProperty("client.jarFileName"));
        clientConfig.setUserName(env.getProperty("client.userName"));
+        clientConfig.setPassword(env.getProperty("client.password"));
        clientConfig.setHost(HostUtils.lookupHost());
        clientConfig.setRemoteArtifact(Boolean.parseBoolean(env.getProperty("client.remoteArtifact")));
 
@@ -83,14 +84,11 @@ public class ClientConfiguration {
     public ActorSystem createActorSystemWithAgent(ClientConfig clientConfig){
         if(!clientConfig.isRemoteArtifact()) {
             //upload files here
-            System.out.println("ClientConfiguration->createActorSystemWithAgent. jarFileFullPath: " + clientConfig.getJarPath());
-            String jarFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath());
+
+            String jarFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath(), clientConfig.getUserName(), clientConfig.getPassword());
             clientConfig.setJarPath(jarFileFullPathResponse);
-            System.out.println("ClientConfiguration->createActorSystemWithAgent. jarFileFullPathResponse: " + jarFileFullPathResponse);
             if (!clientConfig.getDataFeedPath().isEmpty()) {
-                System.out.println("ClientConfiguration->createActorSystemWithAgent. Uploading data file: " + clientConfig.getDataFeedPath());
-                String dataFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getDataFeedPath());
-                System.out.println("ClientConfiguration->createActorSystemWithAgent. dataFileFullPathResponse: " + dataFileFullPathResponse);
+                String dataFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getDataFeedPath(), clientConfig.getUserName(), clientConfig.getPassword());
                 clientConfig.setDataFeedPath(dataFileFullPathResponse);
             }
         }

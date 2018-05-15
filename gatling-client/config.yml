@@ -17,10 +17,15 @@ client.quiet: false
 client.parallelism: 1
 #client.jarPath: /Users/<user>/workspace/<path-to-jar>/gatling-uber-example-1.0.2-SNAPSHOT.jar #path to uber jar
 client.jarPath: /Users/stuartsaltzman/Dev/src/SS/distGatling/gatling-uber-example/target/gatling-uber-example-1.0.2-SNAPSHOT.jar #path to uber jar
-client.userName: Stuart
+client.userName: gatling
 client.remoteArtifact: false
 client.dataFeedFileName: search.csv #data feed file name
 client.jarFileName: gatling-uber-example-1.0.2-SNAPSHOT.jar # jar file name
+
+# SDS: added
+#client.username: "gatling"
+client.password: "gatling"
+
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
 akka:

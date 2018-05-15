@@ -42,6 +42,7 @@ public class ClientConfig implements Serializable {
     private String parameterString;
     private String contactPoint;
     private String userName;
+    private String password;
     private String host;
     private boolean remoteArtifact;
     private String dataFeedFileName;
@@ -192,6 +193,14 @@ public class ClientConfig implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setJarFileName(String jarFileName) {

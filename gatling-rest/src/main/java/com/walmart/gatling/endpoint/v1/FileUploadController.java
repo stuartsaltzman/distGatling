@@ -65,8 +65,6 @@ public class FileUploadController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/upload")
     public String provideUploadInfo(Model model) throws IOException {
-        System.out.println("*** FileUploadController->provideUploadInfo");
-        System.out.println("*** FileUploadController->tempFileDir: " + tempFileDir);
         File rootFolder = new File(tempFileDir);
         if (!rootFolder.exists()) {
             rootFolder.mkdir();
@@ -84,9 +82,7 @@ public class FileUploadController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/uploadFile")
-    public String uploadFile(MultipartHttpServletRequest request, @RequestParam(value = "file", required = false) MultipartFile file) {
-        System.out.println("*** FileUploadController->uploadFile");
-        System.out.println("*** FileUploadController->tempFileDir: " + tempFileDir);
+    public String uploadFile(MultipartHttpServletRequest request, @RequestParam(value = "file", required = true) MultipartFile file) {
         if (!file.isEmpty()) {
             String filePath = tempFileDir + "/" + UUID.randomUUID().toString() + "/" + file.getOriginalFilename();
             try {

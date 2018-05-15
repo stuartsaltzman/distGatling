@@ -31,33 +31,31 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * Created by walmart on 5/16/17.
  */
 public class UploadUtils {
 
-    public static String uploadFile(String server, String path){
+    public static String uploadFile(String server, String path, String authUserName,String authPassword) {
         CloseableHttpClient client = HttpClientBuilder.create()
                 .build();
 
-        System.out.println("*** Client->uploadFile. Server: " + server);
-        System.out.println("*** Client->uploadFile. path: " + path);
-
         HttpPost post = new HttpPost( server + "/uploadFile");
-        //File jarFile = new File(jarFilePath);
         File dataFeedFile = new File(path);
         String host = HostUtils.lookupHost();
-        System.out.println("*** Client->uploadFile. host: " + host);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        //builder.addBinaryBody("jarFile", jarFile, ContentType.DEFAULT_BINARY, jarFile.getName());
         builder.addBinaryBody("file", dataFeedFile, ContentType.DEFAULT_BINARY, dataFeedFile.getName());
         builder.addTextBody("client", host, ContentType.DEFAULT_BINARY);
 
-        // FIXME: hardcode username/password
-        post.addHeader("Authorization", "Basic Z2F0bGluZzpnYXRsaW5n");
+        if (authUserName != null && authPassword != null) {
+            String basicAuth = new String(Base64.getEncoder().encodeToString(String.format("%s:%s", authUserName, authPassword).getBytes(StandardCharsets.UTF_8)));
+            post.addHeader("Authorization", String.format("Basic %s", basicAuth));
+        }
 
         HttpEntity entity = builder.build();
         post.setEntity(entity);

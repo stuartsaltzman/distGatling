@@ -91,9 +91,6 @@ public class AgentConfig {
     }
 
     public String getGenericUrl(String path, String queryStringKey, String queryStringValue) {
-        System.out.println("path: " + path);
-        System.out.println("queryStringKey: " + queryStringKey);
-        System.out.println("queryStringValue: " + queryStringValue);
         if (queryStringValue == null) {
             queryStringValue = "";
         }

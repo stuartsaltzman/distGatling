@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -18,16 +18,7 @@
 
 package com.walmart.gatling.commons;
 
-import akka.actor.AbstractActor;
-import akka.actor.ActorInitializationException;
-import akka.actor.ActorRef;
-import akka.actor.Cancellable;
-import akka.actor.DeathPactException;
-import akka.actor.OneForOneStrategy;
-import akka.actor.Props;
-import akka.actor.ReceiveTimeout;
-import akka.actor.SupervisorStrategy;
-import akka.actor.Terminated;
+import akka.actor.*;
 import akka.cluster.client.ClusterClient;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -66,30 +57,27 @@ public class Worker extends AbstractActor {
                 getContext().become(receiveBuilder()
                         .matchAny(p -> waitForWorkIsDoneAck.apply(p))
                         .build());
-            }
-            else if (message instanceof  Worker.FileUploadComplete){
+            } else if (message instanceof Worker.FileUploadComplete) {
                 sendToMaster(message);
                 getContext().become(receiveBuilder()
-                        .matchAny(p->idle.apply(p))
+                        .matchAny(p -> idle.apply(p))
                         .build());
-            }
-            else if (message instanceof WorkFailed) {
+            } else if (message instanceof WorkFailed) {
                 Object result = ((WorkFailed) message).result;
                 log.info("Work is failed. Result {}.", result);
-                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),result));
+                sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(), result));
                 getContext().become(receiveBuilder()
-                        .matchAny(p->idle.apply(p))
+                        .matchAny(p -> idle.apply(p))
                         .build());
                 //getContext().setReceiveTimeout(Duration.create(5, "seconds"));
                 ///Procedure<Object> waitForWorkIsDoneAck = waitForWorkIsDoneAck(result);
                 //getContext().become(waitForWorkIsDoneAck);
-            }
-            else if(message==KeepAliveTick){
+            } else if (message == KeepAliveTick) {
                 log.info("Job is in progress. {}.", jobId());
-                if (currentJobId!=null){
+                if (currentJobId != null) {
                     sendToMaster(new MasterWorkerProtocol.WorkInProgress(workerId, jobId()));
                 }
-            }else if (message instanceof Job) {
+            } else if (message instanceof Job) {
                 log.info("Yikes. Master told me to do work, while I'm working.");
             } else {
                 unhandled(message);
@@ -99,10 +87,9 @@ public class Worker extends AbstractActor {
 
     private final Procedure<Object> idle = new Procedure<Object>() {
         public void apply(Object message) {
-            if(message==KeepAliveTick){
+            if (message == KeepAliveTick) {
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsFile(workerId, workerRole, host));
-            }
-            else if (message instanceof MasterWorkerProtocol.WorkIsReady)
+            } else if (message instanceof MasterWorkerProtocol.WorkIsReady)
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
             else if (message instanceof Master.Job) {
                 Job job = (Job) message;
@@ -110,20 +97,18 @@ public class Worker extends AbstractActor {
                 currentJobId = job.jobId;
                 workExecutor.tell(job, getSelf());
                 getContext().become(receiveBuilder()
-                        .matchAny(p->working.apply(p))
+                        .matchAny(p -> working.apply(p))
                         .build());
-            }
-            else if (message instanceof Master.FileJob) {
+            } else if (message instanceof Master.FileJob) {
                 Master.FileJob fileJob = (Master.FileJob) message;
                 log.info("Got file upload work: {}", fileJob.uploadFileRequest);
                 currentJobId = fileJob.jobId;
                 workExecutor.tell(fileJob, getSelf());
                 getContext().become(receiveBuilder()
-                        .matchAny(p->working.apply(p))
+                        .matchAny(p -> working.apply(p))
                         .build());
-            }
-            else
-             unhandled(message);
+            } else
+                unhandled(message);
         }
     };
 
@@ -152,16 +137,16 @@ public class Worker extends AbstractActor {
         this.keepAliveTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), KeepAliveTick, getContext().dispatcher(), getSelf());
     }
 
-    public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval,String workerRole) {
+    public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval, String workerRole) {
         return Props.create(Worker.class, clusterClient, workExecutorProps, registerInterval, workerRole);
     }
 
-    public static Props props(ActorRef clusterClient, Props workExecutorProps,String workerRole) {
-        return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"),workerRole);
+    public static Props props(ActorRef clusterClient, Props workExecutorProps, String workerRole) {
+        return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"), workerRole);
     }
 
     private String jobId() {
-        if (currentJobId!=null)
+        if (currentJobId != null)
             return currentJobId;
         else
             throw new IllegalStateException("Not working");
@@ -171,33 +156,31 @@ public class Worker extends AbstractActor {
     public SupervisorStrategy supervisorStrategy() {
         return new OneForOneStrategy(-1, Duration.Inf(),
                 t -> {
-                    log.info("Throwable, Work is failed for1 "+ t);
+                    log.info("Throwable, Work is failed for1 " + t);
                     if (t instanceof ActorInitializationException)
                         return stop();
                     else if (t instanceof DeathPactException)
                         return stop();
                     else if (t instanceof RuntimeException) {
-                        if (currentJobId!=null) {
-                            log.info("RuntimeException, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
+                        if (currentJobId != null) {
+                            log.info("RuntimeException, Work is failed for " + currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(), new Result(-1, "", "", "", null)));
                         }
                         getContext().become(receiveBuilder()
-                                .matchAny(p->idle.apply(p))
+                                .matchAny(p -> idle.apply(p))
                                 .build());
                         return restart();
-                    }
-                    else if (t instanceof Exception) {
-                        if (currentJobId!=null) {
-                            log.info("Exception, Work is failed for "+ currentJobId);
-                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(),new Result(-1,"","","",null)));
+                    } else if (t instanceof Exception) {
+                        if (currentJobId != null) {
+                            log.info("Exception, Work is failed for " + currentJobId);
+                            sendToMaster(new MasterWorkerProtocol.WorkFailed(workerId, jobId(), new Result(-1, "", "", "", null)));
                         }
                         getContext().become(receiveBuilder()
-                                .matchAny(p->idle.apply(p))
+                                .matchAny(p -> idle.apply(p))
                                 .build());
                         return restart();
-                    }
-                    else {
-                        log.info("Throwable, Work is failed for "+ t);
+                    } else {
+                        log.info("Throwable, Work is failed for " + t);
                         return escalate();
                     }
                 }
@@ -226,7 +209,7 @@ public class Worker extends AbstractActor {
                 sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId, workerRole));
                 getContext().setReceiveTimeout(Duration.Undefined());
                 getContext().become(receiveBuilder()
-                        .matchAny(p->idle.apply(p))
+                        .matchAny(p -> idle.apply(p))
                         .build());
             } else if (message instanceof ReceiveTimeout) {
                 log.info("No ack from master, retrying (" + workerId + " -> " + jobId() + ")");
@@ -239,16 +222,15 @@ public class Worker extends AbstractActor {
 
     {
         getContext().become(receiveBuilder()
-                .matchAny(p->idle.apply(p))
+                .matchAny(p -> idle.apply(p))
                 .build());
     }
 
     @Override
     public void unhandled(Object message) {
-        if(message==KeepAliveTick){
+        if (message == KeepAliveTick) {
             //do nothing
-        }
-        else if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
+        } else if (message instanceof Terminated && ((Terminated) message).getActor().equals(workExecutor)) {
             log.info("Received Terminated from exec.");
             getContext().stop(getSelf());
         } else if (message instanceof MasterWorkerProtocol.WorkIsReady) {

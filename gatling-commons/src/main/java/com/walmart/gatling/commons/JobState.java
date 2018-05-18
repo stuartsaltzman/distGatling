@@ -52,6 +52,7 @@ public final class JobState {
         completedJobs = new ConcurrentLinkedQueue<>();
         jobSummary = new HashMap<>();
     }
+
     private JobState(JobState jobState, JobAccepted workAccepted) {
         ConcurrentLinkedDeque<Master.Job> tmp_pendingJob = new ConcurrentLinkedDeque<Master.Job>(jobState.pendingJobs);
         Set<String> tmp_acceptedWorkIds = new HashSet<String>(jobState.acceptedJobIds);
@@ -78,7 +79,6 @@ public final class JobState {
 
 
     }
-
 
     public JobState(JobState jobState, JobStarted workStarted) {
         ConcurrentLinkedDeque<Master.Job> tmp_pendingJob = new ConcurrentLinkedDeque<>(jobState.pendingJobs);

@@ -52,7 +52,7 @@ public class CommandClientActor extends AbstractActor {
 
     private final Procedure<Object> idle = new Procedure<Object>() {
         public void apply(Object message) {
-            if(message== StartCommand){
+            if(message == StartCommand){
                 //upload artifacts if not remoteArtifact
                 //upload jar=>jarPath
                 //upload feed=>feedPath

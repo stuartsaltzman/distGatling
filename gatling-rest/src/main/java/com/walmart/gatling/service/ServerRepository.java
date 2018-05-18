@@ -87,7 +87,7 @@ public class ServerRepository {
             Object info = Await.result(future, timeout.duration());
             if (info instanceof MasterClientActor.Ok) {
                 MasterClientActor.Ok ok = (MasterClientActor.Ok) info;
-                log.debug("Ok Message from server just got here: {}", info);
+                log.debug("Ok Message from server: {}", info);
                 return ok.getMsg();
             }
         } catch (Exception e) {
@@ -156,7 +156,7 @@ public class ServerRepository {
             Object result = Await.result(future, timeout.duration());
             if (result instanceof MasterClientActor.Ok) {
                 success++;
-                log.debug("Ok message from server just got here, this indicates the job was successfully posted to the master: {}", result);
+                log.debug("Ok message from server, this indicates the job was successfully posted to the master: {}", result);
             }
         }
 

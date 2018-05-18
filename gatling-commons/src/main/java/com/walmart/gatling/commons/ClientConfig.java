@@ -20,6 +20,7 @@ package com.walmart.gatling.commons;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -90,7 +91,7 @@ public class ClientConfig implements Serializable {
     }
 
     public String getDataFeedPath() {
-        return dataFeedPath;
+        return Optional.ofNullable(dataFeedPath).orElse("");
     }
 
     public void setDataFeedPath(String dataFeedPath) {

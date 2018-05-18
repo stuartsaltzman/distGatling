@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -41,16 +41,16 @@ public class HostUtils {
 
     public static String lookupIp() {
         String ipAddress;
-        ipAddress = System.getProperty("bind.ip.address",getLocalAddress());
+        ipAddress = System.getProperty("bind.ip.address", getLocalAddress());
         return ipAddress;
     }
 
-    private static String getLocalAddress(){
+    private static String getLocalAddress() {
         try {
             Enumeration<NetworkInterface> b = NetworkInterface.getNetworkInterfaces();
-            while( b.hasMoreElements()){
-                for ( InterfaceAddress f : b.nextElement().getInterfaceAddresses())
-                    if ( f.getAddress().isSiteLocalAddress())
+            while (b.hasMoreElements()) {
+                for (InterfaceAddress f : b.nextElement().getInterfaceAddresses())
+                    if (f.getAddress().isSiteLocalAddress())
                         return f.getAddress().getHostAddress();
             }
         } catch (SocketException e) {

@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -20,18 +20,13 @@ package com.walmart.gatling.commons;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by ahailemichael on 8/18/15.
@@ -45,9 +40,9 @@ public class AgentConfig {
     private String contactPoint;
 
     public Stream<String> getContactPoint() {
-        String[] contacts = contactPoint.split(",") ;
+        String[] contacts = contactPoint.split(",");
         return Stream.of(contacts)
-                .map(p -> String.format("akka.tcp://%s@%s/system/receptionist",Constants.PerformanceSystem, p));
+                .map(p -> String.format("akka.tcp://%s@%s/system/receptionist", Constants.PerformanceSystem, p));
     }
 
     public void setContactPoint(String contactPoint) {
@@ -79,15 +74,15 @@ public class AgentConfig {
     }
 
     public String getUrl(String filePath) {
-        return getGenericUrl("api/log/stream","filePath", filePath);
+        return getGenericUrl("api/log/stream", "filePath", filePath);
     }
 
     public String getMasterUrl(String filePath) {
-        return getGenericUrl("gatling/lib/stream","filePath", filePath);
+        return getGenericUrl("gatling/lib/stream", "filePath", filePath);
     }
 
     public String getAbortUrl() {
-        return getGenericUrl("gatling/server/abort","trackingId", StringUtils.EMPTY);
+        return getGenericUrl("gatling/server/abort", "trackingId", StringUtils.EMPTY);
     }
 
     public String getGenericUrl(String path, String queryStringKey, String queryStringValue) {
@@ -114,7 +109,7 @@ public class AgentConfig {
     }
 
     public String getJobFileUrl(String simulationFilePath) {
-        return getGenericUrl("gatling/lib/file","filePath",simulationFilePath);
+        return getGenericUrl("gatling/lib/file", "filePath", simulationFilePath);
     }
 
     @XmlRootElement
@@ -191,11 +186,11 @@ public class AgentConfig {
         private int[] exitValues;
         private String jobDirectory;
 
-        public String getJobDirectory(String taskId,String postFix, String filePath) {
+        public String getJobDirectory(String taskId, String postFix, String filePath) {
             return jobDirectory + taskId + "/" + postFix + "/" + filePath;
         }
 
-        public String getJobDirectory(String taskId,String postFix) {
+        public String getJobDirectory(String taskId, String postFix) {
             return jobDirectory + taskId + "/" + postFix;
         }
 
@@ -240,7 +235,7 @@ public class AgentConfig {
             return String.format("%slogs/errors/%s/%s.log", logDirectory, jobName, jobId);
         }
 
-        public String getResultPath(String roleId,String jobId) {
+        public String getResultPath(String roleId, String jobId) {
             return String.format("%s/%s/%s", logDirectory, roleId, jobId);
         }
 
@@ -269,7 +264,7 @@ public class AgentConfig {
         }
 
         public int[] getExitValues() {
-            if (exitValues==null)
+            if (exitValues == null)
                 return new int[]{0};
             return exitValues;
         }

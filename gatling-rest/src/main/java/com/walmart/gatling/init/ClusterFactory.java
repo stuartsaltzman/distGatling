@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -18,15 +18,7 @@
 
 package com.walmart.gatling.init;
 
-import akka.actor.ActorIdentity;
-import akka.actor.ActorPath;
-import akka.actor.ActorPath$;
-import akka.actor.ActorRef;
-import akka.actor.ActorSelection;
-import akka.actor.ActorSystem;
-import akka.actor.Identify;
-import akka.actor.PoisonPill;
-import akka.actor.Props;
+import akka.actor.*;
 import akka.cluster.singleton.ClusterSingletonManager;
 import akka.cluster.singleton.ClusterSingletonManagerSettings;
 import akka.dispatch.OnFailure;
@@ -51,15 +43,17 @@ public class ClusterFactory {
 
     /**
      * Creates the actor system with the master
+     *
      * @param port
      * @param role
      * @param isPrimary
      * @param agentConfig
      * @return
      */
-    public static ActorSystem startMaster(int port, String role, boolean isPrimary,AgentConfig agentConfig) {
+    public static ActorSystem startMaster(int port, String role, boolean isPrimary, AgentConfig agentConfig) {
         String ip = HostUtils.lookupIp();
-        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip ,port);
+        System.out.println("*** ClusterFactory->startMaster. ip: " + ip);
+        String seed = String.format("akka.cluster.seed-nodes=[\"akka.tcp://%s@%s:%s\"]", Constants.PerformanceSystem, ip, port);
         Config conf = ConfigFactory.parseString("akka.cluster.roles=[" + role + "]").
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)).
                 withFallback(ConfigFactory.parseString("akka.remote.netty.tcp.hostname=" + ip)).
@@ -67,12 +61,13 @@ public class ClusterFactory {
                 withFallback(ConfigFactory.load("application"));
 
         ActorSystem system = ActorSystem.create(Constants.PerformanceSystem, conf);
-        ClusterFactory.getMaster(port,role,isPrimary,system,agentConfig,ip);
+        ClusterFactory.getMaster(port, role, isPrimary, system, agentConfig, ip);
         return system;
     }
 
     /**
      * Creates the master actor using cluster singleton manager in the specified actor system
+     *
      * @param port
      * @param role
      * @param isPrimary
@@ -81,21 +76,22 @@ public class ClusterFactory {
      * @param ip
      * @return
      */
-    public static ActorRef  getMaster(int port,String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig,String ip) {
-        String journalPath = String.format("akka.tcp://%s@%s:%s/user/store", Constants.PerformanceSystem,  ip ,port);
+    public static ActorRef getMaster(int port, String role, boolean isPrimary, ActorSystem system, AgentConfig agentConfig, String ip) {
+        String journalPath = String.format("akka.tcp://%s@%s:%s/user/store", Constants.PerformanceSystem, ip, port);
         startupSharedJournal(system, isPrimary, ActorPath$.MODULE$.fromString(journalPath));
         FiniteDuration workTimeout = Duration.create(120, "seconds");
         final ClusterSingletonManagerSettings settings =
                 ClusterSingletonManagerSettings.create(system).withRole(role);
 
         ActorRef ref = system.actorOf(
-                ClusterSingletonManager.props(Master.props(workTimeout,agentConfig), PoisonPill.getInstance(), settings),
+                ClusterSingletonManager.props(Master.props(workTimeout, agentConfig), PoisonPill.getInstance(), settings),
                 "master");
         return ref;
     }
 
     /**
      * Associates a journal actor for master, the master is a persistent actor
+     *
      * @param system
      * @param startStore
      * @param path
@@ -115,7 +111,7 @@ public class ClusterFactory {
 
             @Override
             public void onSuccess(Object arg0) throws Throwable {
-                if (arg0 instanceof ActorIdentity && ((ActorIdentity) arg0).getRef()!=null) {
+                if (arg0 instanceof ActorIdentity && ((ActorIdentity) arg0).getRef() != null) {
                     SharedLeveldbJournal.setStore(((ActorIdentity) arg0).getRef(), system);
                 } else {
                     System.err.println("Shared journal not started at " + path);

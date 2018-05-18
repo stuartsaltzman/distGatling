@@ -67,7 +67,7 @@ public class ClientConfiguration {
        clientConfig.setJarPath(env.getProperty("client.jarPath"));
        clientConfig.setJarFileName(env.getProperty("client.jarFileName"));
        clientConfig.setUserName(env.getProperty("client.userName"));
-        clientConfig.setPassword(env.getProperty("client.password"));
+       clientConfig.setPassword(env.getProperty("client.password"));
        clientConfig.setHost(HostUtils.lookupHost());
        clientConfig.setRemoteArtifact(Boolean.parseBoolean(env.getProperty("client.remoteArtifact")));
 
@@ -83,11 +83,10 @@ public class ClientConfiguration {
     @Bean
     public ActorSystem createActorSystemWithAgent(ClientConfig clientConfig){
         if(!clientConfig.isRemoteArtifact()) {
-            //upload files here
-
+            // upload files here
             String jarFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getJarPath(), clientConfig.getUserName(), clientConfig.getPassword());
             clientConfig.setJarPath(jarFileFullPathResponse);
-            if (!clientConfig.getDataFeedPath().isEmpty()) {
+            if (clientConfig.getDataFeedPath() != null && !clientConfig.getDataFeedPath().isEmpty()) {
                 String dataFileFullPathResponse = UploadUtils.uploadFile(serverUrl, clientConfig.getDataFeedPath(), clientConfig.getUserName(), clientConfig.getPassword());
                 clientConfig.setDataFeedPath(dataFileFullPathResponse);
             }

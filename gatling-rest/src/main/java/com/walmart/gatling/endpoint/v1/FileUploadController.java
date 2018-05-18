@@ -82,14 +82,12 @@ public class FileUploadController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/uploadFile")
-    public String uploadFile(MultipartHttpServletRequest request, @RequestParam(value = "file", required = true) MultipartFile file) {
+    public String uploadFile(MultipartHttpServletRequest request, @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
             String filePath = tempFileDir + "/" + UUID.randomUUID().toString() + "/" + file.getOriginalFilename();
             try {
                 FileUtils.touch(new File(filePath));
-
-                BufferedOutputStream stream = new BufferedOutputStream(
-                        new FileOutputStream(new File(filePath)));
+                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
                 FileCopyUtils.copy(file.getInputStream(), stream);
                 stream.close();
                 return filePath;
@@ -105,36 +103,34 @@ public class FileUploadController {
         MultipartFile dataFile = request.getFile("dataFile");
         MultipartFile bodiesFile = request.getFile("bodiesFile");
         Map<String, String[]> paramMap = request.getParameterMap();
-        String packageName = getValue(paramMap, "packageName"), partitionName = getValue(paramMap, "partitionName");
+        String packageName = getValue(paramMap, "packageName");
+        String partitionName = getValue(paramMap, "partitionName");
         String fileName = packageName.replace('.', '/') + ".scala";
         String trackingId = "";
         SimulationJobModel job = new SimulationJobModel();
         String dataFilePath = "";//should be empty by default
         String bodiesFilePath = "";//should be empty by default
-        //System.out.println("*** FileUploadController->uploadAndRunSimulation");
+
         if (!simulationFile.isEmpty()) {
             try {
                 if (dataFile != null && !dataFile.isEmpty()) {
                     dataFilePath = tempFileDir + "/" + dataFile.getOriginalFilename();
                     FileUtils.touch(new File(dataFilePath));
-                    BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(dataFilePath)));
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(dataFilePath)));
                     FileCopyUtils.copy(dataFile.getInputStream(), stream);
                     stream.close();
                 }
                 if (bodiesFile != null && !bodiesFile.isEmpty()) {
                     bodiesFilePath = tempFileDir + "/" + bodiesFile.getOriginalFilename();
                     FileUtils.touch(new File(bodiesFilePath));
-                    BufferedOutputStream stream = new BufferedOutputStream(
-                            new FileOutputStream(new File(bodiesFilePath)));
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(bodiesFilePath)));
                     FileCopyUtils.copy(bodiesFile.getInputStream(), stream);
                     stream.close();
                 }
 
                 String simulationFilePath = tempFileDir + "/" + fileName;
                 FileUtils.touch(new File(simulationFilePath));
-                BufferedOutputStream stream = new BufferedOutputStream(
-                        new FileOutputStream(new File(simulationFilePath)));
+                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(simulationFilePath)));
                 FileCopyUtils.copy(simulationFile.getInputStream(), stream);
                 stream.close();
                 job = new SimulationJobModel();
@@ -149,6 +145,15 @@ public class FileUploadController {
                 job.setFileFullName(packageName);
                 job.setParameterString(getValue(paramMap, "parameter"));
                 log.info("Submitting job: {}", job);
+                // Submitting job: SimulationJobModel(partitionAccessKey=,
+                // user=,
+                // roleId=,
+                // simulation=/Users/stuartsaltzman/workspace/uploads//com/walmart/store/gatling/simulation/BasicSimulation.scala,
+                // dataFile=,
+                // bodiesFile=,
+                // jobId=null, tag=,
+                // count=1,
+                // fileFullName=com.walmart.store.gatling.simulation.BasicSimulation
                 Optional<String> tId = serverRepository.submitSimulationJob(job);
                 trackingId = tId.get();
             } catch (Exception e) {

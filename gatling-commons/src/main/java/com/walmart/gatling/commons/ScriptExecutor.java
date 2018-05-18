@@ -1,7 +1,7 @@
 /*
  *
  *   Copyright 2016 Walmart Technology
- *  
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -23,12 +23,7 @@ import akka.actor.Cancellable;
 import akka.dispatch.ExecutionContexts;
 import akka.dispatch.OnFailure;
 import akka.dispatch.OnSuccess;
-//import javafx.util.Pair;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.LogOutputStream;
-import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -51,7 +46,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static akka.dispatch.Futures.*;
+import static akka.dispatch.Futures.future;
+
+//import javafx.util.Pair;
 
 /**
  * Created by ahailemichael on 8/17/15.
@@ -138,14 +135,14 @@ public class ScriptExecutor extends WorkExecutor {
         try {
             url = new URL(abortUrl + trackingId);
         } catch (MalformedURLException e) {
-            log.error("Error on URL for receiving abort status: {}",e);
+            log.error("Error on URL for receiving abort status: {}", e);
             e.printStackTrace();
         }
         try (InputStream input = url.openStream()) {
             String resultString = IOUtils.toString(input, StandardCharsets.UTF_8);
             return Boolean.parseBoolean(resultString);
         } catch (IOException e) {
-            log.error("Error receiving abort status: {}",e);
+            log.error("Error receiving abort status: {}", e);
             e.printStackTrace();
         }
         return false;
@@ -190,22 +187,22 @@ public class ScriptExecutor extends WorkExecutor {
             cmdLine.addArgument(pair);
         }
         //download the simulation or jar file
-        DownloadFile.downloadFile(job.jobFileUrl,agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
+        DownloadFile.downloadFile(job.jobFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION, taskEvent.getJobInfo().fileFullName));
         //job simulation artifact path
-        cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,SIMULATION));
+        cmdLine.addArgument("-sf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, SIMULATION));
         //download the data feed
-        if(taskEvent.getJobInfo().hasDataFeed) {
-            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA,taskEvent.getJobInfo().dataFileName));
+        if (taskEvent.getJobInfo().hasDataFeed) {
+            DownloadFile.downloadFile(job.dataFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, DATA, taskEvent.getJobInfo().dataFileName));
             //job data feed  path
-            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,DATA));
+            cmdLine.addArgument("-df").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, DATA));
         }
-        if(taskEvent.getJobInfo().hasBodiesFeed) {
-            DownloadFile.downloadFileAndUnzip(job.bodiesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, BODIES,taskEvent.getJobInfo().bodiesFileName));
+        if (taskEvent.getJobInfo().hasBodiesFeed) {
+            DownloadFile.downloadFileAndUnzip(job.bodiesFileUrl, agentConfig.getJob().getJobDirectory(job.jobId, BODIES, taskEvent.getJobInfo().bodiesFileName));
             //job bodies feed  path
-            cmdLine.addArgument("-bdf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId,BODIES));
+            cmdLine.addArgument("-bdf").addArgument(agentConfig.getJob().getJobDirectory(job.jobId, BODIES));
         }
-        
-        
+
+
         //report file path
         cmdLine.addArgument("-rf").addArgument(agentConfig.getJob().getResultPath(job.roleId, job.jobId));
 
@@ -227,13 +224,13 @@ public class ScriptExecutor extends WorkExecutor {
 
             PumpStreamHandler psh = new PumpStreamHandler(new ExecLogHandler(outFile), new ExecLogHandler(errorFile));
             executor.setStreamHandler(psh);
-            Map<String,String> envOptions = new HashMap<>();
+            Map<String, String> envOptions = new HashMap<>();
             //additional user parameters
-            if (taskEvent.getJobInfo().parameterString != null && !taskEvent.getJobInfo().parameterString.isEmpty()){
-                envOptions.put("JAVA_OPTS" , taskEvent.getJobInfo().parameterString);
+            if (taskEvent.getJobInfo().parameterString != null && !taskEvent.getJobInfo().parameterString.isEmpty()) {
+                envOptions.put("JAVA_OPTS", taskEvent.getJobInfo().parameterString);
             }
-            log.info("command: {} and env options {}", cmdLine,envOptions);
-            int exitResult = executor.execute(cmdLine,envOptions);
+            log.info("command: {} and env options {}", cmdLine, envOptions);
+            int exitResult = executor.execute(cmdLine, envOptions);
             //executor.getWatchdog().destroyProcess().
             Worker.Result result = new Worker.Result(exitResult, agentConfig.getUrl(errPath), agentConfig.getUrl(outPath), null, job);
             log.info("Exit code: {}", exitResult);

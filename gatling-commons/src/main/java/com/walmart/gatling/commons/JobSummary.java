@@ -159,7 +159,7 @@ public class JobSummary implements Serializable {
             this.parameterString = parameterString;
             this.dataFileName = dataFileName;
             this.bodiesFileName = bodiesFilename;
-            this.jarFileName =   jarFileName;
+            this.jarFileName = jarFileName;
         }
 
         private JobInfo(Builder builder) {

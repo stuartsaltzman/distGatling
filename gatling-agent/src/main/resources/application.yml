@@ -2,7 +2,7 @@ server:
   port: 8090 # Server information for embedded jetty
 
 actor:
-  numberOfActors: 5 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
+  numberOfActors: 1 # Number of worker actors , controls the number of parallel simulation jobs you can run per process
   port: 2556 # Port number for the actor system that host the worker actors
   role: "public" # The name of the role each actor uses (role1,role2...role5 etc)
   executerType: "script"
@@ -15,7 +15,7 @@ job:
   path: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1" # Path to the base directory where the gatling simulation, data, and conf are stored
   logDirectory: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1/" # Base directory for logfiles(log/error and log/std)
   artifact: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1/bin/{0}.sh" # Path for the location of gatling.sh
-  jobDirectory: /home/ubuntu/gspace/ # directory to store artifacts temporarily, only applicable for agents
+  jobDirectory: "/home/ubuntu/gspace/" # directory to store artifacts temporarily, only applicable for agents
 
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on

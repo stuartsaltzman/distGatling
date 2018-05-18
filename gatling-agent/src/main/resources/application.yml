@@ -12,10 +12,10 @@ job:
   #logDirectory: "/Users/stuartsaltzman/workspace/gatling-charts-highcharts-bundle-2.3.1/" # Base directory for logfiles(log/error and log/std)
   #artifact: "/Users/stuartsaltzman/workspace/gatling-charts-highcharts-bundle-2.3.1/bin/{0}.sh" # Path for the location of gatling.sh
   #jobDirectory: /Users/stuartsaltzman/workspace/gspace/ # directory to store artifacts temporarily, only applicable for agents
-  path: "/gatling-charts-highcharts-bundle-2.3.1" # Path to the base directory where the gatling simulation, data, and conf are stored
-  logDirectory: "/gatling-charts-highcharts-bundle-2.3.1/" # Base directory for logfiles(log/error and log/std)
-  artifact: "/gatling-charts-highcharts-bundle-2.3.1/bin/{0}.sh" # Path for the location of gatling.sh
-  jobDirectory: /gspace/ # directory to store artifacts temporarily, only applicable for agents
+  path: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1" # Path to the base directory where the gatling simulation, data, and conf are stored
+  logDirectory: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1/" # Base directory for logfiles(log/error and log/std)
+  artifact: "/home/ubuntu/gatling-charts-highcharts-bundle-2.3.1/bin/{0}.sh" # Path for the location of gatling.sh
+  jobDirectory: /home/ubuntu/gspace/ # directory to store artifacts temporarily, only applicable for agents
 
 # Actor identifier  that is used to join the master/cluster
 # update the host and port value to point to the cluster where the master is running on
